@@ -1,0 +1,34 @@
+{
+  "name": "grpc-bchrpc",
+  "version": "0.0.6",
+  "description": "A common interface for grpc-bchrpc-* packages.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "protoc --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts --ts_out=./ ./bchrpc.proto"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simpleledgerinc/grpc-bchrpc.git"
+  },
+  "keywords": [
+    "SLP",
+    "Bitcoin",
+    "Cash"
+  ],
+  "author": "James Cramer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/simpleledgerinc/grpc-bchrpc/issues"
+  },
+  "homepage": "https://github.com/simpleledgerinc/grpc-bchrpc#readme",
+  "dependencies": {
+    "@types/google-protobuf": "^3.7.3",
+    "buffer": "^5.6.0",
+    "google-protobuf": "^3.13.0",
+    "typescript": "^3.9.7"
+  },
+  "devDependencies": {
+    "ts-protoc-gen": "^0.13.0"
+  }
+}
