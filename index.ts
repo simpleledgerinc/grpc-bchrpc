@@ -16,7 +16,7 @@ export interface IBchrpc {
     GetBlockchainInfoResponse: any;
     GetHeadersResponse: any;
     SlpRequiredBurn: SlpRequiredBurn;
-    SubmitTransactionResponse: any;
+    SubmitTransactionResponse: SubmitTransactionResponse;
     CheckSlpTransactionResponse: any;
     GetTokenMetadataResponse: any;
     GetBip44HdAddressResponse: any;
@@ -155,4 +155,13 @@ export interface SlpRequiredBurn {
     outpointVout?: number;
     amount?: string;
     setMintBatonVout?: number;
+}
+
+export interface SubmitTransactionResponse {
+    getHash(): Uint8Array | string;
+    getHash_asU8(): Uint8Array;
+    getHash_asB64(): string;
+    setHash(value: Uint8Array | string): void;
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): any;
 }
