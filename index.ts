@@ -87,7 +87,7 @@ export interface IGrpcClient {
         txnBuf?: Buffer,
         txnHex?: string,
         txn?: Uint8Array,
-        requiredSlpBurns?: Array<IBchrpc["SlpRequiredBurn"]>,
+        requiredSlpBurns?: Array<IBchrpc["SlpRequiredBurn"]|any>,
         skipSlpValidityChecks?: boolean,
     }): Promise<IBchrpc["SubmitTransactionResponse"]>;
 
@@ -128,7 +128,7 @@ export interface IGrpcClient {
         txnBuf?: Buffer,
         txnHex?: string,
         txn?: Uint8Array,
-        requiredSlpBurns?: Array<IBchrpc["SlpRequiredBurn"]>,
+        requiredSlpBurns?: Array<IBchrpc["SlpRequiredBurn"]|any>,
     }): Promise<IBchrpc["CheckSlpTransactionResponse"]>;
 
     getTokenMetadata(tokenIds: string[]|Buffer[]): Promise<IBchrpc["GetTokenMetadataResponse"]>
