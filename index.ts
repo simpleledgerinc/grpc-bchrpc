@@ -15,7 +15,7 @@ export interface IBchrpc {
     GetBlockInfoResponse: any;
     GetBlockchainInfoResponse: any;
     GetHeadersResponse: any;
-    SlpRequiredBurn: ISlpRequiredBurn;
+    SlpRequiredBurn: SlpRequiredBurn;
     SubmitTransactionResponse: any;
     CheckSlpTransactionResponse: any;
     GetTokenMetadataResponse: any;
@@ -148,15 +148,11 @@ export interface IGrpcClient {
 
 }
 
-export interface ITransactionInputOutpoint {
-    setHash(Buffer): ITransactionInputOutpoint;
-    setIndex(number): ITransactionInputOutpoint;
-}
-
-export interface ISlpRequiredBurn {
-    setTokenId(Buffer): ISlpRequiredBurn;
-    setTokenType(number): ISlpRequiredBurn;
-    setOutpoint(ITransactionInputOutpoint): ISlpRequiredBurn;
-    setAmount(string): ISlpRequiredBurn;
-    setMintBatonVout(number): ISlpRequiredBurn;
+export interface SlpRequiredBurn {
+    tokenId: Buffer;
+    tokenType: number;
+    outpointHash?: Buffer;
+    outpointVout?: number;
+    amount?: string;
+    setMintBatonVout?: number;
 }
