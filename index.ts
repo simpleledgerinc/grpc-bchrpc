@@ -15,7 +15,7 @@ export interface IBchrpc {
     GetBlockInfoResponse: any;
     GetBlockchainInfoResponse: any;
     GetHeadersResponse: any;
-    SlpRequiredBurn: any;
+    SlpRequiredBurn: ISlpRequiredBurn;
     SubmitTransactionResponse: any;
     CheckSlpTransactionResponse: any;
     GetTokenMetadataResponse: any;
@@ -87,7 +87,7 @@ export interface IGrpcClient {
         txnBuf?: Buffer,
         txnHex?: string,
         txn?: Uint8Array,
-        requiredSlpBurns?: IBchrpc["SlpRequiredBurn"][],
+        requiredSlpBurns?: Array<IBchrpc["SlpRequiredBurn"]>,
         skipSlpValidityChecks?: boolean,
     }): Promise<IBchrpc["SubmitTransactionResponse"]>;
 
@@ -146,4 +146,17 @@ export interface IGrpcClient {
 
     getParsedSlpScript(script: string|Buffer): Promise<IBchrpc["GetParsedSlpScriptResponse"]>;
 
+}
+
+export interface ITransactionInputOutpoint {
+    setHash(Buffer): ITransactionInputOutpoint;
+    setIndex(number): ITransactionInputOutpoint;
+}
+
+export interface ISlpRequiredBurn {
+    setTokenId(Buffer): ISlpRequiredBurn;
+    setTokenType(number): ISlpRequiredBurn;
+    setOutpoint(ITransactionInputOutpoint): ISlpRequiredBurn;
+    setAmount(string): ISlpRequiredBurn;
+    setMintBatonVout(number): ISlpRequiredBurn;
 }
