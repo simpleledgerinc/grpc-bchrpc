@@ -85,26 +85,27 @@ service bchrpc {
     // **Requires TxIndex**
     rpc GetMerkleProof(GetMerkleProofRequest) returns (GetMerkleProofResponse) {}
 
-    // GetTokenMetadata return SLP token metadata for one or more tokens.
+    // GetTokenMetadata return slp token metadata for one or more tokens.
     //
     // **Requires SlpIndex**
     rpc GetTokenMetadata(GetTokenMetadataRequest) returns (GetTokenMetadataResponse) {}
 
-    // GetParsedSlpScript returns marshalled object from parsing an SLP pubKeyScript 
+    // GetParsedSlpScript returns marshalled object from parsing an slp pubKeyScript 
     // using goslp package.  This endpoint does not require SlpIndex.
     rpc GetParsedSlpScript(GetParsedSlpScriptRequest) returns (GetParsedSlpScriptResponse) {}
 
-    // GetTrustedValidation returns SLP validity related information for one or more transactions.
+    // GetTrustedValidation returns slp validity related information for one or more transactions.
     //
     // **Requires SlpIndex**
     rpc GetTrustedSlpValidation(GetTrustedSlpValidationRequest) returns (GetTrustedSlpValidationResponse) {}
 
-    // GetBip44HdAddress returns an address associated with a provided xpub, address index, and
-    // selecting either internal or external by setting the change boolean.  If SlpIndex is disabled
-    // the slpAddress string will be an empty string.
-    rpc GetBip44HdAddress(GetBip44HdAddressRequest) returns (GetBip44HdAddressResponse) {}
+    // GraphSearch returns all the transactions needed for a client to validate an SLP graph
+    //
+    // **Requires SlpIndex and  SlpGraphSearch**
+    rpc GetSlpGraphSearch (GetSlpGraphSearchRequest) returns (GetSlpGraphSearchResponse) {}
 
-    // CheckSlpTransaction checks the SLP validity of an unbroadcasted transaction.
+
+    // CheckSlpTransaction checks the validity of a supposed slp transaction before it is broadcasted.
     rpc CheckSlpTransaction(CheckSlpTransactionRequest) returns (CheckSlpTransactionResponse) {}
 
     // Submit a transaction to all connected peers.
@@ -130,7 +131,6 @@ service bchrpc {
     // grpc-web.
     //
     // **Requires TxIndex to receive input metadata**
-    // TODO: Add slp metadata similar to "SubscribeTransactions"
     rpc SubscribeTransactionStream(stream SubscribeTransactionsRequest) returns (stream TransactionNotification) {}
 
     // SubscribeBlocks creates a subscription for notifications of new blocks being
@@ -204,7 +204,12 @@ message GetBlockchainInfoResponse {
     // When `addr_index` is true, the node has address index enabled and may
     // be used with call related by address.
     bool addr_index =7;
+    // When `slp_index` is true, the node has the slp index enabled and may
+    // be used with slp related rpc methods and also causes slp metadata to be added
+    // in some of the existing rpc methods.
     bool slp_index = 8;
+    // When `slp_graphsearch` is true, the node is able to handle calls to slp graph search
+    bool slp_graphsearch = 9;
 }
 
 message GetBlockInfoRequest {
@@ -462,10 +467,28 @@ message SubmitTransactionResponse {
 message CheckSlpTransactionRequest {
     bytes transaction = 1;
     repeated SlpRequiredBurn required_slp_burns = 2;
+
+    // Using the slp specification as a basis for validity judgement can lead to confusion for new users and
+    // result in accidental token burns.  use_spec_validity_judgement will cause the response's is_valid property
+    // to be returned according to the slp specification.  Therefore, use_spec_validity_judgement is false by
+    // default in order to avoid accidental token burns.  When use_spec_validity_judgement is false we return
+    // invalid in any case which would result in a burned token, unless the burn is explicitly included as an
+    // item in required_slp_burns property.
+    //
+    // When use_spec_validity_judgement is true, there are three cases where the is_valid response property
+    // will be returned as valid, instead of invalid, as per the slp specification.  
+    //   1) inputs > outputs
+    //   2) missing transaction outputs
+    //   3) burned inputs from other tokens
+    // 
+    // required_slp_burns is not used when use_spec_validity_judgement is set to true.
+    //
+    bool use_spec_validity_judgement = 3;
 }
 
 message CheckSlpTransactionResponse {
     bool is_valid = 1;
+    string invalid_reason = 2;
 }
 
 // Request to subscribe or unsubscribe from a stream of transactions.
@@ -538,13 +561,14 @@ message GetParsedSlpScriptRequest {
 message GetParsedSlpScriptResponse {
     string parsing_error = 1;
     bytes token_id = 2;
-    SlpVersionType type = 3;
+    SlpAction slp_action = 3;
+    uint32 token_type = 4;
     oneof slp_metadata {
-        SlpV1GenesisMetadata v1_genesis = 4;    // NFT1 Group also uses this
-        SlpV1MintMetadata v1_mint = 5;          // NFT1 Group also uses this
-        SlpV1SendMetadata v1_send = 6;          // NFT1 Group also uses this
-        SlpNft1ChildGenesisMetadata nft1_child_genesis = 7;
-        SlpNft1ChildSendMetadata nft1_child_send = 8;
+        SlpV1GenesisMetadata v1_genesis = 5;    // NFT1 Group also uses this
+        SlpV1MintMetadata v1_mint = 6;          // NFT1 Group also uses this
+        SlpV1SendMetadata v1_send = 7;          // NFT1 Group also uses this
+        SlpNft1ChildGenesisMetadata nft1_child_genesis = 8;
+        SlpNft1ChildSendMetadata nft1_child_send = 9;
     }
 }
 
@@ -552,8 +576,10 @@ message GetTrustedSlpValidationRequest {
     message Query {
         bytes prev_out_hash = 1;
         uint32 prev_out_vout = 2;
+        repeated bytes graphsearch_valid_hashes = 3;
     }
     repeated Query queries = 1;
+    bool include_graphsearch_count = 2;
 }
 
 message GetTrustedSlpValidationResponse {
@@ -561,32 +587,29 @@ message GetTrustedSlpValidationResponse {
         bytes prev_out_hash = 1;
         uint32 prev_out_vout = 2;
         bytes token_id = 3;
-        SlpVersionType slp_version = 4;
+        SlpAction slp_action = 4;
+        uint32 token_type = 5;
         oneof validity_result_type {
-            uint64 v1_token_amount = 5;
-            bool v1_mint_baton = 6;
+            uint64 v1_token_amount = 6 [jstype = JS_STRING];
+            bool v1_mint_baton = 7;
         }
-        bytes slp_txn_opreturn = 7;
+        bytes slp_txn_opreturn = 8;
+        uint32 graphsearch_txn_count = 9;
     }
 
-    // allows server to respond to a request with multiple
     repeated ValidityResult results = 1;
 }
 
-message GetBip44HdAddressRequest {
-    string xpub = 1;
-    bool change = 2;
-    uint32 address_index = 3;
+message GetSlpGraphSearchRequest {
+    bytes hash = 1;
+    repeated bytes valid_hashes = 2;
 }
 
-message GetBip44HdAddressResponse {
-    bytes pub_key = 1;
-    string cash_addr = 2;
-    string slp_addr = 3;
+message GetSlpGraphSearchResponse {
+    repeated bytes txdata = 1;
 }
 
 // NOTIFICATIONS
-
 
 message BlockNotification {
     // State of the block in relation to the chain.
@@ -802,10 +825,10 @@ message TransactionFilter {
     repeated bytes data_elements = 3;
 
     // Subscribed/Unsubscribe to everything. Other filters
-    // will be ignored.    
+    // will be ignored.
     bool all_transactions = 4;
 
-    // Subscribed/Unsubscribe to everything SLP. Other filters
+    // Subscribed/Unsubscribe to everything slp. Other filters
     // will be ignored, except this filter will be overriden by all_transactions=true
     bool all_slp_transactions = 5;
 
@@ -813,7 +836,7 @@ message TransactionFilter {
     repeated bytes slp_token_ids = 6;
 }
 
-// SLP token info used in transaction inputs / outputs
+// SlpToken info used in transaction inputs / outputs
 //
 // WARNING: Some languages (e.g., JavaScript) may not properly handle the 'uint64'
 // for large amounts. For this reason, an annotation has been added for JS to
@@ -826,11 +849,13 @@ message SlpToken {
     bool is_mint_baton = 3;
     string address = 4;
     uint32 decimals = 5;
-    SlpVersionType version_type = 6;
+    SlpAction slp_action = 6;
+    uint32 token_type = 7;
 }
 
+// SlpTransactionInfo is used inside the Transaction message type.
 message SlpTransactionInfo {
-    SlpVersionType version_type = 1;
+    SlpAction slp_action = 1;
     enum ValidityJudgement {
         UNKNOWN_OR_INVALID = 0;
         VALID = 1;
@@ -855,6 +880,7 @@ message SlpTransactionInfo {
     }
 }
 
+// SlpV1GenesisMetadata is used to marshal type 1 and NFT1 Group GENESIS OP_RETURN scriptPubKey
 message SlpV1GenesisMetadata {
     bytes name = 1;
     bytes ticker = 2;
@@ -862,18 +888,21 @@ message SlpV1GenesisMetadata {
     bytes document_hash = 4;
     uint32 decimals = 5;
     uint32 mint_baton_vout = 6;
-    uint64 mint_amount = 7;
+    uint64 mint_amount = 7 [jstype = JS_STRING];
 }
 
+// SlpV1MintMetadata is used to marshal type 1 MINT OP_RETURN scriptPubKey
 message SlpV1MintMetadata {
     uint32 mint_baton_vout = 1;
-    uint64 mint_amount = 2;
+    uint64 mint_amount = 2 [jstype = JS_STRING];
 }
 
+// SlpV1SendMetadata is used to marshal type 1 and NFT1 Group SEND OP_RETURN scriptPubKey
 message SlpV1SendMetadata {
-    repeated uint64 amounts = 1;
+    repeated uint64 amounts = 1 [jstype = JS_STRING];
 }
 
+// SlpNft1ChildGenesisMetadata is used to marshal NFT1 Child GENESIS OP_RETURN scriptPubKey
 message SlpNft1ChildGenesisMetadata {
     bytes name = 1;
     bytes ticker = 2;
@@ -883,13 +912,18 @@ message SlpNft1ChildGenesisMetadata {
     bytes group_token_id = 6;
 }
 
+// SlpNft1ChildSendMetadata is used to marshal NFT1 Child SEND OP_RETURN scriptPubKey
 message SlpNft1ChildSendMetadata {
     bytes group_token_id = 1;
 }
 
-enum SlpVersionType {       // everything except "NON_SLP" could be annotated with burn_flags  
-    NON_SLP = 0;            // "NON_SLP" would not be persisted by "--slpindex" option (but would with "--txindex")
-    NON_SLP_BURN = 1;       // same as NON_SLP, except the transaction includes burned SLP inputs                       
+// SlpAction is used to allow clients to identify the type of slp transaction from this single field.
+//
+// NOTE: All enum types except for "NON_SLP" may be annotated with one or more BurnFlags.
+//
+enum SlpAction {
+    NON_SLP = 0;
+    NON_SLP_BURN = 1;
     SLP_PARSE_ERROR = 2;
     SLP_UNSUPPORTED_VERSION = 3;
     SLP_V1_GENESIS = 4;
@@ -902,34 +936,7 @@ enum SlpVersionType {       // everything except "NON_SLP" could be annotated wi
     SLP_NFT1_UNIQUE_CHILD_SEND = 11;
 }
 
-message TokenMetadataTokenType1 {
-    bytes token_ticker = 1;
-	bytes token_name = 2;
-	bytes token_document_url = 3;
-	bytes token_document_hash = 4;
-	uint32 decimals = 5;
-    bytes mint_baton_txid = 6;   // txn must be confirmed
-    uint32 mint_baton_vout = 7;
-}
-
-message TokenMetadataNFT1Group {
-    bytes token_ticker = 1;
-	bytes token_name = 2;
-	bytes token_document_url = 3;
-	bytes token_document_hash = 4;
-	uint32 decimals = 5;
-    bytes mint_baton_txid = 6;   // txn must be confirmed
-    uint32 mint_baton_vout = 7;
-}
-
-message TokenMetadataNFT1Child {
-    bytes token_ticker = 1;
-	bytes token_name = 2;
-	bytes token_document_url = 3;
-	bytes token_document_hash = 4;
-    bytes group_id = 5;
-}
-
+// TokenMetadata is used to marshal metadata about a specific TokenID
 message TokenMetadata {
 	bytes token_id = 1;
  	uint32 token_type = 2;
@@ -940,12 +947,44 @@ message TokenMetadata {
     }
 }
 
+// TokenMetadataTokenType1 is used to marshal metadata specific to Type 1 token IDs
+message TokenMetadataTokenType1 {
+    bytes token_ticker = 1;
+	bytes token_name = 2;
+	bytes token_document_url = 3;
+	bytes token_document_hash = 4;
+	uint32 decimals = 5;
+    bytes mint_baton_hash = 6;
+    uint32 mint_baton_vout = 7;
+}
+
+// TokenMetadataNFT1Group is used to marshal metadata specific to NFT1 Group token IDs
+message TokenMetadataNFT1Group {
+    bytes token_ticker = 1;
+	bytes token_name = 2;
+	bytes token_document_url = 3;
+	bytes token_document_hash = 4;
+	uint32 decimals = 5;
+    bytes mint_baton_hash = 6;
+    uint32 mint_baton_vout = 7;
+}
+
+// TokenMetadataNFT1Child is used to marshal metadata specific to NFT1 Child token IDs
+message TokenMetadataNFT1Child {
+    bytes token_ticker = 1;
+	bytes token_name = 2;
+	bytes token_document_url = 3;
+	bytes token_document_hash = 4;
+    bytes group_id = 5;
+}
+
+// SlpRequiredBurn is used by clients to allow token burning
 message SlpRequiredBurn {
     Transaction.Input.Outpoint outpoint = 1;
     bytes token_id = 2;
     uint32 token_type = 3;
     oneof burn_intention {
-        uint64 amount = 4;
-        bool mint_baton = 5;
+        uint64 amount = 4 [jstype = JS_STRING];
+        uint32 mint_baton_vout = 5;
     }
 }

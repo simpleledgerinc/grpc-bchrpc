@@ -165,6 +165,9 @@ export class GetBlockchainInfoResponse extends jspb.Message {
   getSlpIndex(): boolean;
   setSlpIndex(value: boolean): void;
 
+  getSlpGraphsearch(): boolean;
+  setSlpGraphsearch(value: boolean): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetBlockchainInfoResponse.AsObject;
   static toObject(includeInstance: boolean, msg: GetBlockchainInfoResponse): GetBlockchainInfoResponse.AsObject;
@@ -185,6 +188,7 @@ export namespace GetBlockchainInfoResponse {
     txIndex: boolean,
     addrIndex: boolean,
     slpIndex: boolean,
+    slpGraphsearch: boolean,
   }
 
   export interface BitcoinNetMap {
@@ -1010,6 +1014,9 @@ export class CheckSlpTransactionRequest extends jspb.Message {
   setRequiredSlpBurnsList(value: Array<SlpRequiredBurn>): void;
   addRequiredSlpBurns(value?: SlpRequiredBurn, index?: number): SlpRequiredBurn;
 
+  getUseSpecValidityJudgement(): boolean;
+  setUseSpecValidityJudgement(value: boolean): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CheckSlpTransactionRequest.AsObject;
   static toObject(includeInstance: boolean, msg: CheckSlpTransactionRequest): CheckSlpTransactionRequest.AsObject;
@@ -1024,12 +1031,16 @@ export namespace CheckSlpTransactionRequest {
   export type AsObject = {
     transaction: Uint8Array | string,
     requiredSlpBurnsList: Array<SlpRequiredBurn.AsObject>,
+    useSpecValidityJudgement: boolean,
   }
 }
 
 export class CheckSlpTransactionResponse extends jspb.Message {
   getIsValid(): boolean;
   setIsValid(value: boolean): void;
+
+  getInvalidReason(): string;
+  setInvalidReason(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CheckSlpTransactionResponse.AsObject;
@@ -1044,6 +1055,7 @@ export class CheckSlpTransactionResponse extends jspb.Message {
 export namespace CheckSlpTransactionResponse {
   export type AsObject = {
     isValid: boolean,
+    invalidReason: string,
   }
 }
 
@@ -1192,8 +1204,11 @@ export class GetParsedSlpScriptResponse extends jspb.Message {
   getTokenId_asB64(): string;
   setTokenId(value: Uint8Array | string): void;
 
-  getType(): SlpVersionTypeMap[keyof SlpVersionTypeMap];
-  setType(value: SlpVersionTypeMap[keyof SlpVersionTypeMap]): void;
+  getSlpAction(): SlpActionMap[keyof SlpActionMap];
+  setSlpAction(value: SlpActionMap[keyof SlpActionMap]): void;
+
+  getTokenType(): number;
+  setTokenType(value: number): void;
 
   hasV1Genesis(): boolean;
   clearV1Genesis(): void;
@@ -1235,7 +1250,8 @@ export namespace GetParsedSlpScriptResponse {
   export type AsObject = {
     parsingError: string,
     tokenId: Uint8Array | string,
-    type: SlpVersionTypeMap[keyof SlpVersionTypeMap],
+    slpAction: SlpActionMap[keyof SlpActionMap],
+    tokenType: number,
     v1Genesis?: SlpV1GenesisMetadata.AsObject,
     v1Mint?: SlpV1MintMetadata.AsObject,
     v1Send?: SlpV1SendMetadata.AsObject,
@@ -1245,11 +1261,11 @@ export namespace GetParsedSlpScriptResponse {
 
   export enum SlpMetadataCase {
     SLP_METADATA_NOT_SET = 0,
-    V1_GENESIS = 4,
-    V1_MINT = 5,
-    V1_SEND = 6,
-    NFT1_CHILD_GENESIS = 7,
-    NFT1_CHILD_SEND = 8,
+    V1_GENESIS = 5,
+    V1_MINT = 6,
+    V1_SEND = 7,
+    NFT1_CHILD_GENESIS = 8,
+    NFT1_CHILD_SEND = 9,
   }
 }
 
@@ -1258,6 +1274,9 @@ export class GetTrustedSlpValidationRequest extends jspb.Message {
   getQueriesList(): Array<GetTrustedSlpValidationRequest.Query>;
   setQueriesList(value: Array<GetTrustedSlpValidationRequest.Query>): void;
   addQueries(value?: GetTrustedSlpValidationRequest.Query, index?: number): GetTrustedSlpValidationRequest.Query;
+
+  getIncludeGraphsearchCount(): boolean;
+  setIncludeGraphsearchCount(value: boolean): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetTrustedSlpValidationRequest.AsObject;
@@ -1272,6 +1291,7 @@ export class GetTrustedSlpValidationRequest extends jspb.Message {
 export namespace GetTrustedSlpValidationRequest {
   export type AsObject = {
     queriesList: Array<GetTrustedSlpValidationRequest.Query.AsObject>,
+    includeGraphsearchCount: boolean,
   }
 
   export class Query extends jspb.Message {
@@ -1282,6 +1302,13 @@ export namespace GetTrustedSlpValidationRequest {
 
     getPrevOutVout(): number;
     setPrevOutVout(value: number): void;
+
+    clearGraphsearchValidHashesList(): void;
+    getGraphsearchValidHashesList(): Array<Uint8Array | string>;
+    getGraphsearchValidHashesList_asU8(): Array<Uint8Array>;
+    getGraphsearchValidHashesList_asB64(): Array<string>;
+    setGraphsearchValidHashesList(value: Array<Uint8Array | string>): void;
+    addGraphsearchValidHashes(value: Uint8Array | string, index?: number): Uint8Array | string;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): Query.AsObject;
@@ -1297,6 +1324,7 @@ export namespace GetTrustedSlpValidationRequest {
     export type AsObject = {
       prevOutHash: Uint8Array | string,
       prevOutVout: number,
+      graphsearchValidHashesList: Array<Uint8Array | string>,
     }
   }
 }
@@ -1336,13 +1364,16 @@ export namespace GetTrustedSlpValidationResponse {
     getTokenId_asB64(): string;
     setTokenId(value: Uint8Array | string): void;
 
-    getSlpVersion(): SlpVersionTypeMap[keyof SlpVersionTypeMap];
-    setSlpVersion(value: SlpVersionTypeMap[keyof SlpVersionTypeMap]): void;
+    getSlpAction(): SlpActionMap[keyof SlpActionMap];
+    setSlpAction(value: SlpActionMap[keyof SlpActionMap]): void;
+
+    getTokenType(): number;
+    setTokenType(value: number): void;
 
     hasV1TokenAmount(): boolean;
     clearV1TokenAmount(): void;
-    getV1TokenAmount(): number;
-    setV1TokenAmount(value: number): void;
+    getV1TokenAmount(): string;
+    setV1TokenAmount(value: string): void;
 
     hasV1MintBaton(): boolean;
     clearV1MintBaton(): void;
@@ -1353,6 +1384,9 @@ export namespace GetTrustedSlpValidationResponse {
     getSlpTxnOpreturn_asU8(): Uint8Array;
     getSlpTxnOpreturn_asB64(): string;
     setSlpTxnOpreturn(value: Uint8Array | string): void;
+
+    getGraphsearchTxnCount(): number;
+    setGraphsearchTxnCount(value: number): void;
 
     getValidityResultTypeCase(): ValidityResult.ValidityResultTypeCase;
     serializeBinary(): Uint8Array;
@@ -1370,75 +1404,73 @@ export namespace GetTrustedSlpValidationResponse {
       prevOutHash: Uint8Array | string,
       prevOutVout: number,
       tokenId: Uint8Array | string,
-      slpVersion: SlpVersionTypeMap[keyof SlpVersionTypeMap],
-      v1TokenAmount: number,
+      slpAction: SlpActionMap[keyof SlpActionMap],
+      tokenType: number,
+      v1TokenAmount: string,
       v1MintBaton: boolean,
       slpTxnOpreturn: Uint8Array | string,
+      graphsearchTxnCount: number,
     }
 
     export enum ValidityResultTypeCase {
       VALIDITY_RESULT_TYPE_NOT_SET = 0,
-      V1_TOKEN_AMOUNT = 5,
-      V1_MINT_BATON = 6,
+      V1_TOKEN_AMOUNT = 6,
+      V1_MINT_BATON = 7,
     }
   }
 }
 
-export class GetBip44HdAddressRequest extends jspb.Message {
-  getXpub(): string;
-  setXpub(value: string): void;
+export class GetSlpGraphSearchRequest extends jspb.Message {
+  getHash(): Uint8Array | string;
+  getHash_asU8(): Uint8Array;
+  getHash_asB64(): string;
+  setHash(value: Uint8Array | string): void;
 
-  getChange(): boolean;
-  setChange(value: boolean): void;
-
-  getAddressIndex(): number;
-  setAddressIndex(value: number): void;
+  clearValidHashesList(): void;
+  getValidHashesList(): Array<Uint8Array | string>;
+  getValidHashesList_asU8(): Array<Uint8Array>;
+  getValidHashesList_asB64(): Array<string>;
+  setValidHashesList(value: Array<Uint8Array | string>): void;
+  addValidHashes(value: Uint8Array | string, index?: number): Uint8Array | string;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GetBip44HdAddressRequest.AsObject;
-  static toObject(includeInstance: boolean, msg: GetBip44HdAddressRequest): GetBip44HdAddressRequest.AsObject;
+  toObject(includeInstance?: boolean): GetSlpGraphSearchRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetSlpGraphSearchRequest): GetSlpGraphSearchRequest.AsObject;
   static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
   static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: GetBip44HdAddressRequest, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GetBip44HdAddressRequest;
-  static deserializeBinaryFromReader(message: GetBip44HdAddressRequest, reader: jspb.BinaryReader): GetBip44HdAddressRequest;
+  static serializeBinaryToWriter(message: GetSlpGraphSearchRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetSlpGraphSearchRequest;
+  static deserializeBinaryFromReader(message: GetSlpGraphSearchRequest, reader: jspb.BinaryReader): GetSlpGraphSearchRequest;
 }
 
-export namespace GetBip44HdAddressRequest {
+export namespace GetSlpGraphSearchRequest {
   export type AsObject = {
-    xpub: string,
-    change: boolean,
-    addressIndex: number,
+    hash: Uint8Array | string,
+    validHashesList: Array<Uint8Array | string>,
   }
 }
 
-export class GetBip44HdAddressResponse extends jspb.Message {
-  getPubKey(): Uint8Array | string;
-  getPubKey_asU8(): Uint8Array;
-  getPubKey_asB64(): string;
-  setPubKey(value: Uint8Array | string): void;
-
-  getCashAddr(): string;
-  setCashAddr(value: string): void;
-
-  getSlpAddr(): string;
-  setSlpAddr(value: string): void;
+export class GetSlpGraphSearchResponse extends jspb.Message {
+  clearTxdataList(): void;
+  getTxdataList(): Array<Uint8Array | string>;
+  getTxdataList_asU8(): Array<Uint8Array>;
+  getTxdataList_asB64(): Array<string>;
+  setTxdataList(value: Array<Uint8Array | string>): void;
+  addTxdata(value: Uint8Array | string, index?: number): Uint8Array | string;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GetBip44HdAddressResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: GetBip44HdAddressResponse): GetBip44HdAddressResponse.AsObject;
+  toObject(includeInstance?: boolean): GetSlpGraphSearchResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: GetSlpGraphSearchResponse): GetSlpGraphSearchResponse.AsObject;
   static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
   static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: GetBip44HdAddressResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GetBip44HdAddressResponse;
-  static deserializeBinaryFromReader(message: GetBip44HdAddressResponse, reader: jspb.BinaryReader): GetBip44HdAddressResponse;
+  static serializeBinaryToWriter(message: GetSlpGraphSearchResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetSlpGraphSearchResponse;
+  static deserializeBinaryFromReader(message: GetSlpGraphSearchResponse, reader: jspb.BinaryReader): GetSlpGraphSearchResponse;
 }
 
-export namespace GetBip44HdAddressResponse {
+export namespace GetSlpGraphSearchResponse {
   export type AsObject = {
-    pubKey: Uint8Array | string,
-    cashAddr: string,
-    slpAddr: string,
+    txdataList: Array<Uint8Array | string>,
   }
 }
 
@@ -2051,8 +2083,11 @@ export class SlpToken extends jspb.Message {
   getDecimals(): number;
   setDecimals(value: number): void;
 
-  getVersionType(): SlpVersionTypeMap[keyof SlpVersionTypeMap];
-  setVersionType(value: SlpVersionTypeMap[keyof SlpVersionTypeMap]): void;
+  getSlpAction(): SlpActionMap[keyof SlpActionMap];
+  setSlpAction(value: SlpActionMap[keyof SlpActionMap]): void;
+
+  getTokenType(): number;
+  setTokenType(value: number): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): SlpToken.AsObject;
@@ -2071,13 +2106,14 @@ export namespace SlpToken {
     isMintBaton: boolean,
     address: string,
     decimals: number,
-    versionType: SlpVersionTypeMap[keyof SlpVersionTypeMap],
+    slpAction: SlpActionMap[keyof SlpActionMap],
+    tokenType: number,
   }
 }
 
 export class SlpTransactionInfo extends jspb.Message {
-  getVersionType(): SlpVersionTypeMap[keyof SlpVersionTypeMap];
-  setVersionType(value: SlpVersionTypeMap[keyof SlpVersionTypeMap]): void;
+  getSlpAction(): SlpActionMap[keyof SlpActionMap];
+  setSlpAction(value: SlpActionMap[keyof SlpActionMap]): void;
 
   getValidityJudgement(): SlpTransactionInfo.ValidityJudgementMap[keyof SlpTransactionInfo.ValidityJudgementMap];
   setValidityJudgement(value: SlpTransactionInfo.ValidityJudgementMap[keyof SlpTransactionInfo.ValidityJudgementMap]): void;
@@ -2133,7 +2169,7 @@ export class SlpTransactionInfo extends jspb.Message {
 
 export namespace SlpTransactionInfo {
   export type AsObject = {
-    versionType: SlpVersionTypeMap[keyof SlpVersionTypeMap],
+    slpAction: SlpActionMap[keyof SlpActionMap],
     validityJudgement: SlpTransactionInfo.ValidityJudgementMap[keyof SlpTransactionInfo.ValidityJudgementMap],
     parseError: string,
     tokenId: Uint8Array | string,
@@ -2199,8 +2235,8 @@ export class SlpV1GenesisMetadata extends jspb.Message {
   getMintBatonVout(): number;
   setMintBatonVout(value: number): void;
 
-  getMintAmount(): number;
-  setMintAmount(value: number): void;
+  getMintAmount(): string;
+  setMintAmount(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): SlpV1GenesisMetadata.AsObject;
@@ -2220,7 +2256,7 @@ export namespace SlpV1GenesisMetadata {
     documentHash: Uint8Array | string,
     decimals: number,
     mintBatonVout: number,
-    mintAmount: number,
+    mintAmount: string,
   }
 }
 
@@ -2228,8 +2264,8 @@ export class SlpV1MintMetadata extends jspb.Message {
   getMintBatonVout(): number;
   setMintBatonVout(value: number): void;
 
-  getMintAmount(): number;
-  setMintAmount(value: number): void;
+  getMintAmount(): string;
+  setMintAmount(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): SlpV1MintMetadata.AsObject;
@@ -2244,15 +2280,15 @@ export class SlpV1MintMetadata extends jspb.Message {
 export namespace SlpV1MintMetadata {
   export type AsObject = {
     mintBatonVout: number,
-    mintAmount: number,
+    mintAmount: string,
   }
 }
 
 export class SlpV1SendMetadata extends jspb.Message {
   clearAmountsList(): void;
-  getAmountsList(): Array<number>;
-  setAmountsList(value: Array<number>): void;
-  addAmounts(value: number, index?: number): number;
+  getAmountsList(): Array<string>;
+  setAmountsList(value: Array<string>): void;
+  addAmounts(value: string, index?: number): string;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): SlpV1SendMetadata.AsObject;
@@ -2266,7 +2302,7 @@ export class SlpV1SendMetadata extends jspb.Message {
 
 export namespace SlpV1SendMetadata {
   export type AsObject = {
-    amountsList: Array<number>,
+    amountsList: Array<string>,
   }
 }
 
@@ -2342,160 +2378,6 @@ export namespace SlpNft1ChildSendMetadata {
   }
 }
 
-export class TokenMetadataTokenType1 extends jspb.Message {
-  getTokenTicker(): Uint8Array | string;
-  getTokenTicker_asU8(): Uint8Array;
-  getTokenTicker_asB64(): string;
-  setTokenTicker(value: Uint8Array | string): void;
-
-  getTokenName(): Uint8Array | string;
-  getTokenName_asU8(): Uint8Array;
-  getTokenName_asB64(): string;
-  setTokenName(value: Uint8Array | string): void;
-
-  getTokenDocumentUrl(): Uint8Array | string;
-  getTokenDocumentUrl_asU8(): Uint8Array;
-  getTokenDocumentUrl_asB64(): string;
-  setTokenDocumentUrl(value: Uint8Array | string): void;
-
-  getTokenDocumentHash(): Uint8Array | string;
-  getTokenDocumentHash_asU8(): Uint8Array;
-  getTokenDocumentHash_asB64(): string;
-  setTokenDocumentHash(value: Uint8Array | string): void;
-
-  getDecimals(): number;
-  setDecimals(value: number): void;
-
-  getMintBatonTxid(): Uint8Array | string;
-  getMintBatonTxid_asU8(): Uint8Array;
-  getMintBatonTxid_asB64(): string;
-  setMintBatonTxid(value: Uint8Array | string): void;
-
-  getMintBatonVout(): number;
-  setMintBatonVout(value: number): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): TokenMetadataTokenType1.AsObject;
-  static toObject(includeInstance: boolean, msg: TokenMetadataTokenType1): TokenMetadataTokenType1.AsObject;
-  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: TokenMetadataTokenType1, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): TokenMetadataTokenType1;
-  static deserializeBinaryFromReader(message: TokenMetadataTokenType1, reader: jspb.BinaryReader): TokenMetadataTokenType1;
-}
-
-export namespace TokenMetadataTokenType1 {
-  export type AsObject = {
-    tokenTicker: Uint8Array | string,
-    tokenName: Uint8Array | string,
-    tokenDocumentUrl: Uint8Array | string,
-    tokenDocumentHash: Uint8Array | string,
-    decimals: number,
-    mintBatonTxid: Uint8Array | string,
-    mintBatonVout: number,
-  }
-}
-
-export class TokenMetadataNFT1Group extends jspb.Message {
-  getTokenTicker(): Uint8Array | string;
-  getTokenTicker_asU8(): Uint8Array;
-  getTokenTicker_asB64(): string;
-  setTokenTicker(value: Uint8Array | string): void;
-
-  getTokenName(): Uint8Array | string;
-  getTokenName_asU8(): Uint8Array;
-  getTokenName_asB64(): string;
-  setTokenName(value: Uint8Array | string): void;
-
-  getTokenDocumentUrl(): Uint8Array | string;
-  getTokenDocumentUrl_asU8(): Uint8Array;
-  getTokenDocumentUrl_asB64(): string;
-  setTokenDocumentUrl(value: Uint8Array | string): void;
-
-  getTokenDocumentHash(): Uint8Array | string;
-  getTokenDocumentHash_asU8(): Uint8Array;
-  getTokenDocumentHash_asB64(): string;
-  setTokenDocumentHash(value: Uint8Array | string): void;
-
-  getDecimals(): number;
-  setDecimals(value: number): void;
-
-  getMintBatonTxid(): Uint8Array | string;
-  getMintBatonTxid_asU8(): Uint8Array;
-  getMintBatonTxid_asB64(): string;
-  setMintBatonTxid(value: Uint8Array | string): void;
-
-  getMintBatonVout(): number;
-  setMintBatonVout(value: number): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): TokenMetadataNFT1Group.AsObject;
-  static toObject(includeInstance: boolean, msg: TokenMetadataNFT1Group): TokenMetadataNFT1Group.AsObject;
-  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: TokenMetadataNFT1Group, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): TokenMetadataNFT1Group;
-  static deserializeBinaryFromReader(message: TokenMetadataNFT1Group, reader: jspb.BinaryReader): TokenMetadataNFT1Group;
-}
-
-export namespace TokenMetadataNFT1Group {
-  export type AsObject = {
-    tokenTicker: Uint8Array | string,
-    tokenName: Uint8Array | string,
-    tokenDocumentUrl: Uint8Array | string,
-    tokenDocumentHash: Uint8Array | string,
-    decimals: number,
-    mintBatonTxid: Uint8Array | string,
-    mintBatonVout: number,
-  }
-}
-
-export class TokenMetadataNFT1Child extends jspb.Message {
-  getTokenTicker(): Uint8Array | string;
-  getTokenTicker_asU8(): Uint8Array;
-  getTokenTicker_asB64(): string;
-  setTokenTicker(value: Uint8Array | string): void;
-
-  getTokenName(): Uint8Array | string;
-  getTokenName_asU8(): Uint8Array;
-  getTokenName_asB64(): string;
-  setTokenName(value: Uint8Array | string): void;
-
-  getTokenDocumentUrl(): Uint8Array | string;
-  getTokenDocumentUrl_asU8(): Uint8Array;
-  getTokenDocumentUrl_asB64(): string;
-  setTokenDocumentUrl(value: Uint8Array | string): void;
-
-  getTokenDocumentHash(): Uint8Array | string;
-  getTokenDocumentHash_asU8(): Uint8Array;
-  getTokenDocumentHash_asB64(): string;
-  setTokenDocumentHash(value: Uint8Array | string): void;
-
-  getGroupId(): Uint8Array | string;
-  getGroupId_asU8(): Uint8Array;
-  getGroupId_asB64(): string;
-  setGroupId(value: Uint8Array | string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): TokenMetadataNFT1Child.AsObject;
-  static toObject(includeInstance: boolean, msg: TokenMetadataNFT1Child): TokenMetadataNFT1Child.AsObject;
-  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: TokenMetadataNFT1Child, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): TokenMetadataNFT1Child;
-  static deserializeBinaryFromReader(message: TokenMetadataNFT1Child, reader: jspb.BinaryReader): TokenMetadataNFT1Child;
-}
-
-export namespace TokenMetadataNFT1Child {
-  export type AsObject = {
-    tokenTicker: Uint8Array | string,
-    tokenName: Uint8Array | string,
-    tokenDocumentUrl: Uint8Array | string,
-    tokenDocumentHash: Uint8Array | string,
-    groupId: Uint8Array | string,
-  }
-}
-
 export class TokenMetadata extends jspb.Message {
   getTokenId(): Uint8Array | string;
   getTokenId_asU8(): Uint8Array;
@@ -2548,6 +2430,160 @@ export namespace TokenMetadata {
   }
 }
 
+export class TokenMetadataTokenType1 extends jspb.Message {
+  getTokenTicker(): Uint8Array | string;
+  getTokenTicker_asU8(): Uint8Array;
+  getTokenTicker_asB64(): string;
+  setTokenTicker(value: Uint8Array | string): void;
+
+  getTokenName(): Uint8Array | string;
+  getTokenName_asU8(): Uint8Array;
+  getTokenName_asB64(): string;
+  setTokenName(value: Uint8Array | string): void;
+
+  getTokenDocumentUrl(): Uint8Array | string;
+  getTokenDocumentUrl_asU8(): Uint8Array;
+  getTokenDocumentUrl_asB64(): string;
+  setTokenDocumentUrl(value: Uint8Array | string): void;
+
+  getTokenDocumentHash(): Uint8Array | string;
+  getTokenDocumentHash_asU8(): Uint8Array;
+  getTokenDocumentHash_asB64(): string;
+  setTokenDocumentHash(value: Uint8Array | string): void;
+
+  getDecimals(): number;
+  setDecimals(value: number): void;
+
+  getMintBatonHash(): Uint8Array | string;
+  getMintBatonHash_asU8(): Uint8Array;
+  getMintBatonHash_asB64(): string;
+  setMintBatonHash(value: Uint8Array | string): void;
+
+  getMintBatonVout(): number;
+  setMintBatonVout(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): TokenMetadataTokenType1.AsObject;
+  static toObject(includeInstance: boolean, msg: TokenMetadataTokenType1): TokenMetadataTokenType1.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: TokenMetadataTokenType1, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): TokenMetadataTokenType1;
+  static deserializeBinaryFromReader(message: TokenMetadataTokenType1, reader: jspb.BinaryReader): TokenMetadataTokenType1;
+}
+
+export namespace TokenMetadataTokenType1 {
+  export type AsObject = {
+    tokenTicker: Uint8Array | string,
+    tokenName: Uint8Array | string,
+    tokenDocumentUrl: Uint8Array | string,
+    tokenDocumentHash: Uint8Array | string,
+    decimals: number,
+    mintBatonHash: Uint8Array | string,
+    mintBatonVout: number,
+  }
+}
+
+export class TokenMetadataNFT1Group extends jspb.Message {
+  getTokenTicker(): Uint8Array | string;
+  getTokenTicker_asU8(): Uint8Array;
+  getTokenTicker_asB64(): string;
+  setTokenTicker(value: Uint8Array | string): void;
+
+  getTokenName(): Uint8Array | string;
+  getTokenName_asU8(): Uint8Array;
+  getTokenName_asB64(): string;
+  setTokenName(value: Uint8Array | string): void;
+
+  getTokenDocumentUrl(): Uint8Array | string;
+  getTokenDocumentUrl_asU8(): Uint8Array;
+  getTokenDocumentUrl_asB64(): string;
+  setTokenDocumentUrl(value: Uint8Array | string): void;
+
+  getTokenDocumentHash(): Uint8Array | string;
+  getTokenDocumentHash_asU8(): Uint8Array;
+  getTokenDocumentHash_asB64(): string;
+  setTokenDocumentHash(value: Uint8Array | string): void;
+
+  getDecimals(): number;
+  setDecimals(value: number): void;
+
+  getMintBatonHash(): Uint8Array | string;
+  getMintBatonHash_asU8(): Uint8Array;
+  getMintBatonHash_asB64(): string;
+  setMintBatonHash(value: Uint8Array | string): void;
+
+  getMintBatonVout(): number;
+  setMintBatonVout(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): TokenMetadataNFT1Group.AsObject;
+  static toObject(includeInstance: boolean, msg: TokenMetadataNFT1Group): TokenMetadataNFT1Group.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: TokenMetadataNFT1Group, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): TokenMetadataNFT1Group;
+  static deserializeBinaryFromReader(message: TokenMetadataNFT1Group, reader: jspb.BinaryReader): TokenMetadataNFT1Group;
+}
+
+export namespace TokenMetadataNFT1Group {
+  export type AsObject = {
+    tokenTicker: Uint8Array | string,
+    tokenName: Uint8Array | string,
+    tokenDocumentUrl: Uint8Array | string,
+    tokenDocumentHash: Uint8Array | string,
+    decimals: number,
+    mintBatonHash: Uint8Array | string,
+    mintBatonVout: number,
+  }
+}
+
+export class TokenMetadataNFT1Child extends jspb.Message {
+  getTokenTicker(): Uint8Array | string;
+  getTokenTicker_asU8(): Uint8Array;
+  getTokenTicker_asB64(): string;
+  setTokenTicker(value: Uint8Array | string): void;
+
+  getTokenName(): Uint8Array | string;
+  getTokenName_asU8(): Uint8Array;
+  getTokenName_asB64(): string;
+  setTokenName(value: Uint8Array | string): void;
+
+  getTokenDocumentUrl(): Uint8Array | string;
+  getTokenDocumentUrl_asU8(): Uint8Array;
+  getTokenDocumentUrl_asB64(): string;
+  setTokenDocumentUrl(value: Uint8Array | string): void;
+
+  getTokenDocumentHash(): Uint8Array | string;
+  getTokenDocumentHash_asU8(): Uint8Array;
+  getTokenDocumentHash_asB64(): string;
+  setTokenDocumentHash(value: Uint8Array | string): void;
+
+  getGroupId(): Uint8Array | string;
+  getGroupId_asU8(): Uint8Array;
+  getGroupId_asB64(): string;
+  setGroupId(value: Uint8Array | string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): TokenMetadataNFT1Child.AsObject;
+  static toObject(includeInstance: boolean, msg: TokenMetadataNFT1Child): TokenMetadataNFT1Child.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: TokenMetadataNFT1Child, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): TokenMetadataNFT1Child;
+  static deserializeBinaryFromReader(message: TokenMetadataNFT1Child, reader: jspb.BinaryReader): TokenMetadataNFT1Child;
+}
+
+export namespace TokenMetadataNFT1Child {
+  export type AsObject = {
+    tokenTicker: Uint8Array | string,
+    tokenName: Uint8Array | string,
+    tokenDocumentUrl: Uint8Array | string,
+    tokenDocumentHash: Uint8Array | string,
+    groupId: Uint8Array | string,
+  }
+}
+
 export class SlpRequiredBurn extends jspb.Message {
   hasOutpoint(): boolean;
   clearOutpoint(): void;
@@ -2564,13 +2600,13 @@ export class SlpRequiredBurn extends jspb.Message {
 
   hasAmount(): boolean;
   clearAmount(): void;
-  getAmount(): number;
-  setAmount(value: number): void;
+  getAmount(): string;
+  setAmount(value: string): void;
 
-  hasMintBaton(): boolean;
-  clearMintBaton(): void;
-  getMintBaton(): boolean;
-  setMintBaton(value: boolean): void;
+  hasMintBatonVout(): boolean;
+  clearMintBatonVout(): void;
+  getMintBatonVout(): number;
+  setMintBatonVout(value: number): void;
 
   getBurnIntentionCase(): SlpRequiredBurn.BurnIntentionCase;
   serializeBinary(): Uint8Array;
@@ -2588,18 +2624,18 @@ export namespace SlpRequiredBurn {
     outpoint?: Transaction.Input.Outpoint.AsObject,
     tokenId: Uint8Array | string,
     tokenType: number,
-    amount: number,
-    mintBaton: boolean,
+    amount: string,
+    mintBatonVout: number,
   }
 
   export enum BurnIntentionCase {
     BURN_INTENTION_NOT_SET = 0,
     AMOUNT = 4,
-    MINT_BATON = 5,
+    MINT_BATON_VOUT = 5,
   }
 }
 
-export interface SlpVersionTypeMap {
+export interface SlpActionMap {
   NON_SLP: 0;
   NON_SLP_BURN: 1;
   SLP_PARSE_ERROR: 2;
@@ -2614,5 +2650,5 @@ export interface SlpVersionTypeMap {
   SLP_NFT1_UNIQUE_CHILD_SEND: 11;
 }
 
-export const SlpVersionType: SlpVersionTypeMap;
+export const SlpAction: SlpActionMap;
 

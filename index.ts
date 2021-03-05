@@ -19,9 +19,9 @@ export interface IBchrpc {
     SubmitTransactionResponse: SubmitTransactionResponse;
     CheckSlpTransactionResponse: any;
     GetTokenMetadataResponse: any;
-    GetBip44HdAddressResponse: any;
     GetTrustedSlpValidationResponse: any;
     GetParsedSlpScriptResponse: any;
+    GetGraphSearchFor: any;
 }
 
 export interface IGrpcClient {
@@ -124,28 +124,38 @@ export interface IGrpcClient {
         txnHex,
         txn,
         requiredSlpBurns,
+        useSpecValidityJudgement,
     }: {
         txnBuf?: Buffer,
         txnHex?: string,
         txn?: Uint8Array,
         requiredSlpBurns?: Array<IBchrpc["SlpRequiredBurn"]|any>,
+        useSpecValidityJudgement?: boolean,
     }): Promise<IBchrpc["CheckSlpTransactionResponse"]>;
 
     getTokenMetadata(tokenIds: string[]|Buffer[]): Promise<IBchrpc["GetTokenMetadataResponse"]>
 
     getTrustedSlpValidation({
         txos,
-        reversedHashOrder
+        reversedHashOrder,
+        includeGraphSearchCount
     }: {
         txos: Array<{ hash: string; vout: number; }>,
-        reversedHashOrder?: boolean
+        reversedHashOrder?: boolean,
+        includeGraphSearchCount?: boolean
     }): Promise<IBchrpc["GetTrustedSlpValidationResponse"]>;
-
-    getBip44HdAddress({ xpub, isChange, addressIndex }:
-        {xpub: string, isChange: boolean, addressIndex: number }): Promise<IBchrpc["GetBip44HdAddressResponse"]>;
 
     getParsedSlpScript(script: string|Buffer): Promise<IBchrpc["GetParsedSlpScriptResponse"]>;
 
+    getGraphSearchFor({
+        hash,
+        reversedHashOrder,
+        knownValidHashes
+    }: {
+        hash: string,
+        reversedHashOrder: boolean,
+        knownValidHashes?: string[]
+    }): Promise<IBchrpc["GetGraphSearchFor"]>;
 }
 
 export interface SlpRequiredBurn {
