@@ -1,7 +1,7 @@
 {
   "name": "grpc-bchrpc",
   "version": "0.1.0",
-  "description": "A common interface for 'grpc-bchrpc-node' and 'grpc-bchrpc-web' npm packages.",
+  "description": "An interface for 'grpc-bchrpc-node' and 'grpc-bchrpc-web' npm packages.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,11 +11,6 @@
     "type": "git",
     "url": "git+https://github.com/simpleledgerinc/grpc-bchrpc.git"
   },
-  "keywords": [
-    "SLP",
-    "Bitcoin",
-    "Cash"
-  ],
   "author": "James Cramer",
   "license": "ISC",
   "bugs": {
@@ -25,10 +20,10 @@
   "dependencies": {
     "@types/google-protobuf": "^3.7.4",
     "buffer": "^5.6.0",
-    "google-protobuf": "^3.15.5",
-    "typescript": "^4.2.3"
+    "google-protobuf": "^3.15.5"
   },
   "devDependencies": {
-    "ts-protoc-gen": "^0.14.0"
+    "ts-protoc-gen": "^0.14.0",
+    "typescript": "^4.2.3"
   }
 }
