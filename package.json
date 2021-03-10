@@ -1,6 +1,6 @@
 {
   "name": "grpc-bchrpc",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An interface for 'grpc-bchrpc-node' and 'grpc-bchrpc-web' npm packages.",
   "main": "index.js",
   "scripts": {
