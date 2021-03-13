@@ -18,10 +18,10 @@ export interface IBchrpc {
     SlpRequiredBurn: SlpRequiredBurn;
     SubmitTransactionResponse: SubmitTransactionResponse;
     CheckSlpTransactionResponse: any;
-    GetTokenMetadataResponse: any;
-    GetTrustedSlpValidationResponse: any;
-    GetParsedSlpScriptResponse: any;
-    GetGraphSearchFor: any;
+    GetSlpTokenMetadataResponse: any;
+    GetSlpTrustedValidationResponse: any;
+    GetSlpParsedScriptResponse: any;
+    GetSlpGraphSearchResponse: any;
 }
 
 export interface IGrpcClient {
@@ -133,7 +133,7 @@ export interface IGrpcClient {
         useSpecValidityJudgement?: boolean,
     }): Promise<IBchrpc["CheckSlpTransactionResponse"]>;
 
-    getTokenMetadata(tokenIds: string[]|Buffer[]): Promise<IBchrpc["GetTokenMetadataResponse"]>
+    getTokenMetadata(tokenIds: string[]|Buffer[]): Promise<IBchrpc["GetSlpTokenMetadataResponse"]>
 
     getTrustedSlpValidation({
         txos,
@@ -143,9 +143,9 @@ export interface IGrpcClient {
         txos: Array<{ hash: string; vout: number; }>,
         reversedHashOrder?: boolean,
         includeGraphSearchCount?: boolean
-    }): Promise<IBchrpc["GetTrustedSlpValidationResponse"]>;
+    }): Promise<IBchrpc["GetSlpTrustedValidationResponse"]>;
 
-    getParsedSlpScript(script: string|Buffer): Promise<IBchrpc["GetParsedSlpScriptResponse"]>;
+    getParsedSlpScript(script: string|Buffer): Promise<IBchrpc["GetSlpParsedScriptResponse"]>;
 
     getGraphSearchFor({
         hash,
@@ -155,7 +155,7 @@ export interface IGrpcClient {
         hash: string,
         reversedHashOrder: boolean,
         knownValidHashes?: string[]
-    }): Promise<IBchrpc["GetGraphSearchFor"]>;
+    }): Promise<IBchrpc["GetSlpGraphSearchResponse"]>;
 }
 
 export interface SlpRequiredBurn {
